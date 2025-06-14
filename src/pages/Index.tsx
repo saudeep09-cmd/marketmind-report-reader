@@ -10,9 +10,11 @@ type ParsedReport = {
   summary: string;
   highlights: string[];
   sentiment: "Positive" | "Neutral" | "Negative";
+  fileName: string;
+  ticker: string;
 };
 
-const FAKE_ANALYSIS: ParsedReport = {
+const FAKE_ANALYSIS = {
   summary:
     "This quarterly report shows strong revenue growth driven by core business segments, alongside improvements in operating margins. Management emphasizes continued investments in AI and sustainability. Risks include macroeconomic uncertainty and regulatory headwinds.",
   highlights: [
@@ -22,11 +24,10 @@ const FAKE_ANALYSIS: ParsedReport = {
     "EPS guidance raised for next quarter.",
     "Management flagged potential regulatory risks in overseas markets.",
   ],
-  sentiment: "Positive",
+  sentiment: "Positive" as const,
 };
 
-function fakeAnalyze(file: File, ticker: string): Promise<ParsedReport> {
-  // This mock "analysis" simulates a real AI call and waits 2 seconds.
+function fakeAnalyze(file: File, ticker: string): Promise<Omit<ParsedReport, "fileName" | "ticker">> {
   return new Promise((resolve) =>
     setTimeout(() => {
       resolve({
@@ -38,17 +39,23 @@ function fakeAnalyze(file: File, ticker: string): Promise<ParsedReport> {
 }
 
 export default function Index() {
+  // NEW: Keep track of uploaded reports
+  const [uploadedReports, setUploadedReports] = useState<ParsedReport[]>([]);
   const [parsed, setParsed] = useState<ParsedReport | null>(null);
   const [loading, setLoading] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
 
   async function handleFileSelect(f: File, ticker: string) {
     setParsed(null);
-    setFile(f);
     setLoading(true);
     try {
-      const result = await fakeAnalyze(f, ticker);
-      setParsed(result);
+      const analysis = await fakeAnalyze(f, ticker);
+      const record: ParsedReport = {
+        ...analysis,
+        fileName: f.name,
+        ticker,
+      };
+      setParsed(record);
+      setUploadedReports((r) => [record, ...r]);
       toast({
         title: "Analysis complete",
         description: "Your stock report was analyzed!",
@@ -84,10 +91,15 @@ export default function Index() {
             <div className="mt-12 hidden md:block">
               <span className="text-muted-foreground text-xs uppercase tracking-wide">Recent Uploads</span>
               <div className="rounded-lg bg-slate-100 mt-2 p-3 mb-8 shadow-inner">
-                {/* You can implement a list of recent uploads here. */}
-                <div className="flex gap-2 items-center text-sm text-gray-600">
-                  <span className="inline-block bg-slate-200 rounded px-2 py-1">Q1_Results_Apple.pdf</span>
-                  <span className="inline-block bg-slate-200 rounded px-2 py-1">Tesla-2024-Filing.pdf</span>
+                <div className="flex flex-col gap-2 items-start text-sm text-gray-600">
+                  {uploadedReports.length === 0 && (
+                    <div className="italic text-muted-foreground">No uploads yet.</div>
+                  )}
+                  {uploadedReports.slice(0, 4).map((r, i) => (
+                    <span key={i} className="inline-block bg-slate-200 rounded px-2 py-1">
+                      {r.fileName} {r.ticker && <span className="text-xs text-blue-600">({r.ticker})</span>}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -107,6 +119,12 @@ export default function Index() {
           </div>
         </div>
       </div>
+      {/* Make uploaded reports available to ReportsTable via window object for demo */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `window.LOVABLE_REPORTS=${JSON.stringify(uploadedReports)};`
+        }}
+      />
     </div>
   );
 }

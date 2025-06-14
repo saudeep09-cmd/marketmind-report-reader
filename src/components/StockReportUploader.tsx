@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from "react";
 import { Upload, File, FileSearch } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,6 +22,7 @@ export function StockReportUploader({ onFile, loading }: Props) {
     if (f) {
       setFileName(f.name);
       onFile(f, tickerInput.trim().toUpperCase());
+      setTickerInput(""); // clear ticker after upload
     }
   };
 
@@ -31,6 +31,7 @@ export function StockReportUploader({ onFile, loading }: Props) {
     if (f) {
       setFileName(f.name);
       onFile(f, tickerInput.trim().toUpperCase());
+      setTickerInput(""); // clear ticker after upload
     }
   };
 
