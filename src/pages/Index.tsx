@@ -5,6 +5,7 @@ import { StockReportUploader } from "@/components/StockReportUploader";
 import { StockReportSummary } from "@/components/StockReportSummary";
 import { StockReportAIChat } from "@/components/StockReportAIChat";
 import { toast } from "@/hooks/use-toast";
+import { useReports } from "../context/ReportsContext";
 
 type ParsedReport = {
   summary: string;
@@ -39,8 +40,7 @@ function fakeAnalyze(file: File, ticker: string): Promise<Omit<ParsedReport, "fi
 }
 
 export default function Index() {
-  // NEW: Keep track of uploaded reports
-  const [uploadedReports, setUploadedReports] = useState<ParsedReport[]>([]);
+  const { reports: uploadedReports, addReport } = useReports();
   const [parsed, setParsed] = useState<ParsedReport | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -55,7 +55,7 @@ export default function Index() {
         ticker,
       };
       setParsed(record);
-      setUploadedReports((r) => [record, ...r]);
+      addReport(record);
       toast({
         title: "Analysis complete",
         description: "Your stock report was analyzed!",
@@ -119,12 +119,6 @@ export default function Index() {
           </div>
         </div>
       </div>
-      {/* Make uploaded reports available to ReportsTable via window object for demo */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `window.LOVABLE_REPORTS=${JSON.stringify(uploadedReports)};`
-        }}
-      />
     </div>
   );
 }

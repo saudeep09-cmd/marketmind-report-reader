@@ -1,26 +1,11 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-
-type ParsedReport = {
-  summary: string;
-  highlights: string[];
-  sentiment: "Positive" | "Neutral" | "Negative";
-  fileName: string;
-  ticker: string;
-};
+import { useReports } from "../context/ReportsContext";
 
 export default function ReportsTable() {
-  // Try to get mock reports from global (set in Index)
-  const [reports, setReports] = useState<ParsedReport[]>([]);
-
-  useEffect(() => {
-    // Demo: grab from window object (could be from context/store/backend)
-    if ((window as any).LOVABLE_REPORTS) {
-      setReports((window as any).LOVABLE_REPORTS);
-    }
-  }, []);
+  const { reports } = useReports();
 
   return (
     <div>
