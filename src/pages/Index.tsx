@@ -1,4 +1,3 @@
-
 // Stock Report Analyzer — Desktop Dashboard
 
 import React, { useState } from "react";
@@ -71,15 +70,14 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-100 via-white to-emerald-50 px-0 py-8">
+    <div className="w-full">
       <div className="max-w-screen-xl mx-auto">
-        <h1 className="font-extrabold text-4xl md:text-5xl mb-0 bg-clip-text text-transparent bg-gradient-to-tr from-primary to-blue-600 tracking-tight">
+        <h1 className="font-extrabold text-3xl md:text-4xl mb-0 bg-clip-text text-transparent bg-gradient-to-tr from-primary to-blue-600 tracking-tight">
           Stock Report Analyzer <span className="text-primary">AI</span>
         </h1>
-        <div className="text-xl text-muted-foreground mb-8">
+        <div className="text-lg text-muted-foreground mb-8">
           Instantly summarize, extract highlights &amp; ask questions about any stock report.
         </div>
-
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/3">
             <StockReportUploader onFile={handleFileSelect} loading={loading} />
